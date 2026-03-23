@@ -8,6 +8,7 @@ public abstract class User
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
     public abstract int MaxActiveRentals { get; }
+    public abstract string UserType { get; }
 
     protected User(string firstName, string lastName)
     {
