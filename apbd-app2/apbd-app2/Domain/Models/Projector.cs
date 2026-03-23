@@ -2,5 +2,12 @@
 
 public class Projector : Equipment
 {
-    public string name { get; private set; }
+    public int Lumens { get; private set; }
+    public string Resolution { get; private set; }
+
+    public Projector(string name, int lumens, string resolution) : base(name)
+    {
+        Lumens = lumens;
+        Resolution = resolution;
+    }
 }
