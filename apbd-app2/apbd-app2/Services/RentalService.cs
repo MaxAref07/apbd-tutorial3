@@ -5,17 +5,25 @@ namespace apbd_app2.Services;
 public class RentalService : IRentalService
 {
     private readonly List<Rental> _rentals = new();
-
-    public Rental RentEquipment(User user, Equipment equipment, DateTime dueDate)
+    private readonly IEquipmentService _equipmentService;
+    private readonly IUserService _userService;
+    public RentalService(IEquipmentService equipmentService, IUserService userService)
     {
+        _equipmentService = equipmentService;
+        _userService = userService;
+    }
+    public Rental RentEquipment(Guid userId, Guid equipmentId, DateTime dueDate)
+    {
+        var user = _userService.GetById(userId)
+                   ?? throw new InvalidOperationException("User not found.");
+        var equipment = _equipmentService.GetById(equipmentId)
+                        ?? throw new InvalidOperationException("Equipment not found.");
         if (!equipment.IsAvailable)
             throw new InvalidOperationException($"Equipment '{equipment.Name}' is not available for rental.");
-
-        var activeCount = _rentals.Count(r => r.User.Id == user.Id && r.IsActive);
+        var activeCount = _rentals.Count(r => r.User.Id == userId && r.IsActive);
         if (activeCount >= user.MaxActiveRentals)
             throw new InvalidOperationException(
                 $"User '{user.FirstName} {user.LastName}' has reached the maximum of {user.MaxActiveRentals} active rentals.");
-
         var rental = new Rental(user, equipment, DateTime.Now, dueDate);
         equipment.MarkAsUnavailable();
         _rentals.Add(rental);
